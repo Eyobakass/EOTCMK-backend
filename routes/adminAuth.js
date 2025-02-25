@@ -13,7 +13,7 @@ Router.post("/", async (req, res) => {
     );
     if (!validPassword) return res.status(400).send("Invalid email or password");
     const token = admin.generateAuthToken();
-    res.header("x-auth-token", token).send(_.pick(admin, ["_id", "name"]));
+    res.header("x-auth-token", token).status(200).send(_.pick(admin, ["_id", "name"]));
   } catch (err) {
     console.log(err);
     res.status(500).send("Server Error");
