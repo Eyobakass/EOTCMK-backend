@@ -22,25 +22,32 @@ router.get("/", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-
+router.get('/forHome', async(req, res)=>{
+  try{
+    const sortOrder=req.query.sort==="asc"?1:-1;
+    const posts = await Post.find().sort({createdAt:sortOrder}).select('title smallContent image');
+    if(posts.length==0){
+      return res.status(404).send({message: "No posts found"});
+    }
+    res.status(200).json(posts);
+  }catch(err){
+    console.error(err.message);
+    res.status(500).send({message: err.message});
+  }
+})
 // 🔹 CREATE a new post (Handles image upload)
 router.post("/", authorization, upload.single("image"), async (req, res) => {
   try {
-    const { title, smallContent, fullContent, author } = req.body;
-
-    if (!req.file) {
-      return res.status(400).json({ error: "No image uploaded" });
-    }
+    const { title, smallContent, fullContent} = req.body;
 
     const newPost = new Post({
       title,
       smallContent,
       fullContent,
-      image: {
+      image: req.file?{
         data: req.file.buffer, // Store the binary image data
         contentType: req.file.mimetype, // Store the image type
-      },
-      author,
+      }:undefined,
     });
 
     await newPost.save();
@@ -57,12 +64,11 @@ router.put("/:id", authorization, upload.single("image"), async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    const { title, smallContent, fullContent, author } = req.body;
+    const { title, smallContent, fullContent } = req.body;
 
     post.title = title || post.title;
     post.smallContent = smallContent || post.smallContent;
     post.fullContent = fullContent || post.fullContent;
-    post.author = author || post.author;
 
     // Update image only if a new one is uploaded
     if (req.file) {

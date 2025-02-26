@@ -11,7 +11,7 @@ Router.post("/", async (req, res) => {
       req.body.password,
       admin.password
     );
-    if (!validPassword) return res.status(400).send("Invalid email or password");
+    if (!validPassword) return res.status(400).send({message:"Invalid email or password"});
     const token = admin.generateAuthToken();
     res.header("x-auth-token", token).status(200).send(_.pick(admin, ["_id", "name"]));
   } catch (err) {

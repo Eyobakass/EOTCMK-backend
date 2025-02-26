@@ -9,8 +9,7 @@ const postSchema = new mongoose.Schema({
     contentType: String, // Store the MIME type (e.g., "image/png")
   },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 const Post = mongoose.model("Post", postSchema);
